@@ -15,9 +15,16 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
+  // CDN 리소스: 네트워크 우선
   if (url.hostname.includes('jsdelivr') || url.hostname.includes('mediapipe')) {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
     return;
   }
+  // HTML 파일: 항상 네트워크에서 최신 버전 가져오기
+  if (url.pathname.endsWith('.html') || url.pathname.endsWith('/')) {
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    return;
+  }
+  // 나머지: 캐시 우선
   e.respondWith(caches.match(e.request).then(cached => cached || fetch(e.request)));
 });
