@@ -552,12 +552,24 @@ async function startCamera() {
         stream = await navigator.mediaDevices.getUserMedia({ video: true });
       }
     }
-    webcam.srcObject = stream; camPH.style.display = 'none'; running = true; startBtn.textContent = '중지';
+    webcam.srcObject = stream;
+    await new Promise(resolve => { webcam.onloadedmetadata = resolve; });
+    await webcam.play();
+    camPH.style.display = 'none'; running = true; startBtn.textContent = '중지';
     const wrap = document.getElementById('cam-wrap');
     skelCanvas.width = wrap.clientWidth; skelCanvas.height = wrap.clientHeight;
     setupPose();
-    mpCamera = new Camera(webcam, { onFrame: async () => { await poseDetector.send({ image: webcam }); }, width: 480, height: 360 });
-    mpCamera.start();
+    let processing = false;
+    async function processFrame() {
+      if (!running) return;
+      if (!processing && webcam.readyState >= 2) {
+        processing = true;
+        await poseDetector.send({ image: webcam });
+        processing = false;
+      }
+      requestAnimationFrame(processFrame);
+    }
+    requestAnimationFrame(processFrame);
     statusChip.textContent = '감지 중';
     setFeedback('감지 중... 철봉에 매달려 전신이 보이도록 서주세요.');
   } catch (e) { setFeedback('카메라 오류: ' + e.message, 'bad'); }
@@ -565,7 +577,6 @@ async function startCamera() {
 
 function stopCamera() {
   running = false;
-  if (mpCamera) mpCamera.stop();
   if (webcam.srcObject) webcam.srcObject.getTracks().forEach(t => t.stop());
   webcam.srcObject = null; camPH.style.display = 'flex'; phaseChip.style.display = 'none';
   startBtn.textContent = '카메라 시작'; statusChip.textContent = '대기'; statusChip.style.color = '';
