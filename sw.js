@@ -1,4 +1,4 @@
-const CACHE = 'pullup-coach-v1';
+const CACHE = 'pullup-coach-v2';
 const SHELL = ['./pullup-coach.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

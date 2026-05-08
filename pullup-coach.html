@@ -258,7 +258,6 @@ button:active { opacity: 0.7; }
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3.1675466124/drawing_utils.js"></script>
 <script>
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
@@ -311,7 +310,7 @@ const CM = {
 };
 
 const READY_ANGLE = 148, UP_ANGLE = 102, READY_FRAMES = 6, UP_FRAMES = 3, SMOOTH_K = 0.28;
-let poseDetector, mpCamera, running = false;
+let poseDetector, running = false;
 let totalReps = 0, sessionReps = 0, allScores = [];
 let repState = 'idle', readyFrames = 0, upFrames = 0;
 let smoothL = 170, smoothR = 170;
